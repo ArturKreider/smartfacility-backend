@@ -1,5 +1,6 @@
 package de.artur.smartfacility.user.service;
 
+import de.artur.smartfacility.user.dto.LoginRequest;
 import de.artur.smartfacility.user.dto.RegisterRequest;
 import de.artur.smartfacility.user.dto.UserResponse;
 import de.artur.smartfacility.user.entity.Role;
@@ -36,6 +37,19 @@ public class UserService {
         return Optional.of(response);
     }
 
+    public Optional<UserResponse> login (LoginRequest login){
+        Optional<User> optionalUser = userRepository.findByEmail(login.getEmail());
+        if(optionalUser.isEmpty()){
+            return Optional.empty();
+        }
+        User existingUser = optionalUser.get();
+        boolean passwordCorrect = passwordEncoder.matches(login.getPassword(), existingUser.getPassword());
+        if(!passwordCorrect){
+            return Optional.empty();
+        }
+        UserResponse response = mapToResponse(existingUser);
+        return Optional.of(response);
+    }
 
     // Mapping
 
