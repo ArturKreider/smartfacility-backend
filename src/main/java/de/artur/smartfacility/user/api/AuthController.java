@@ -31,4 +31,12 @@ public class AuthController {
                 .map(user -> ResponseEntity.status(HttpStatus.OK).body(user))
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser (@PathVariable Long id){
+        if(!userService.deleteUser(id)){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -2,6 +2,7 @@ package de.artur.smartfacility.building.api;
 
 import de.artur.smartfacility.building.dto.BuildingCreateRequest;
 import de.artur.smartfacility.building.dto.BuildingResponse;
+import de.artur.smartfacility.building.entity.Building;
 import de.artur.smartfacility.building.service.BuildingService;
 import de.artur.smartfacility.room.dto.RoomCreateRequest;
 import de.artur.smartfacility.room.dto.RoomResponse;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/buildings")
@@ -24,16 +26,17 @@ public class BuildingController {
         this.roomService = roomService;
     }
 
-    @PostMapping
-    public ResponseEntity<BuildingResponse> createBuilding(@RequestBody BuildingCreateRequest dto) {
-        BuildingResponse response = buildingService.createBuilding(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<BuildingResponse> createBuilding(@PathVariable Long userId, @RequestBody BuildingCreateRequest dto) {
+        return buildingService.createBuilding(userId, dto)
+                .map(b -> ResponseEntity.status(HttpStatus.CREATED).body(b))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{buildingId}/rooms")
     public ResponseEntity<RoomResponse> createRoomInBuilding(@PathVariable Long buildingId, @RequestBody RoomCreateRequest dto) {
         return roomService.createRoomInBuilding(buildingId, dto)
-                .map(r -> ResponseEntity.ok(r))
+                .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -53,14 +56,14 @@ public class BuildingController {
     @GetMapping("/{id}")
     public ResponseEntity<BuildingResponse> getBuildingById(@PathVariable Long id) {
         return buildingService.getBuildingById(id)
-                .map(b -> ResponseEntity.ok(b))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BuildingResponse> updateBuilding(@PathVariable Long id, @RequestBody BuildingCreateRequest dto) {
         return buildingService.updateBuilding(id, dto)
-                .map(b -> ResponseEntity.ok(b))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

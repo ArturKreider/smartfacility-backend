@@ -51,6 +51,14 @@ public class UserService {
         return Optional.of(response);
     }
 
+    public boolean deleteUser (Long id){
+        if(!userRepository.existsById(id)){
+            return false;
+        }
+        userRepository.deleteById(id);
+        return true;
+    }
+
     // Mapping
 
     private User mapToEntity(RegisterRequest dto){

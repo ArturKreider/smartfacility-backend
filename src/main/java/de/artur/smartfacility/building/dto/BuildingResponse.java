@@ -5,6 +5,7 @@ public class BuildingResponse {
     private Long id;
     private String name;
     private String address;
+    private Long userId;
 
     //Methoden
     public void setId(Long id) {
@@ -28,5 +29,13 @@ public class BuildingResponse {
     }
     public String getAddress() {
         return this.address;
+    }
+
+
+    public void setUserId(Long userId){
+        this.userId = userId;
+    }
+    public Long getUserId(){
+        return this.userId;
     }
 }

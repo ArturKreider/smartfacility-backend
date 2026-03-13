@@ -4,6 +4,8 @@ import de.artur.smartfacility.building.dto.BuildingCreateRequest;
 import de.artur.smartfacility.building.dto.BuildingResponse;
 import de.artur.smartfacility.building.entity.Building;
 import de.artur.smartfacility.building.repository.BuildingRepository;
+import de.artur.smartfacility.user.entity.User;
+import de.artur.smartfacility.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,18 +16,27 @@ import java.util.Optional;
 public class BuildingService {
 
     private final BuildingRepository buildingRepository;
+    private final UserRepository userRepository;
 
-    public BuildingService(BuildingRepository buildingRepository) {
+    public BuildingService(BuildingRepository buildingRepository, UserRepository userRepository) {
         this.buildingRepository = buildingRepository;
+        this.userRepository = userRepository;
     }
 
 
     // Methoden
 
-    public BuildingResponse createBuilding(BuildingCreateRequest dto) {
+    public Optional<BuildingResponse> createBuilding(Long userId, BuildingCreateRequest dto) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()){
+            return Optional.empty();
+        }
+        User existingUser = optionalUser.get();
         Building building = mapToEntity(dto);
+        building.setUser(existingUser);
         Building savedBuilding = buildingRepository.save(building);
-        return mapToResponse(savedBuilding);
+        BuildingResponse response = mapToResponse(savedBuilding);
+        return Optional.of(response);
     }
 
     public List<BuildingResponse> getAllBuildings() {
@@ -84,6 +95,7 @@ public class BuildingService {
         response.setId(building.getId());
         response.setName(building.getName());
         response.setAddress(building.getAddress());
+        response.setUserId(building.getUser().getId());
         return response;
     }
 }

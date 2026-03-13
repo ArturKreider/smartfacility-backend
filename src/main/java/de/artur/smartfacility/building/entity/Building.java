@@ -1,6 +1,7 @@
 package de.artur.smartfacility.building.entity;
 
 import de.artur.smartfacility.room.entity.Room;
+import de.artur.smartfacility.user.entity.User;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -22,6 +23,10 @@ public class Building {
 
     @OneToMany(mappedBy = "building")
     private List<Room> rooms;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User user;
 
     // Konstruktoren
 
@@ -57,6 +62,13 @@ public class Building {
 
     public List<Room> getRooms() {
         return this.rooms;
+    }
+
+    public void setUser(User user){
+        this.user = user;
+    }
+    public User getUser(){
+        return this.user;
     }
 
 }

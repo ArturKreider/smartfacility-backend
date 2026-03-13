@@ -1,6 +1,9 @@
 package de.artur.smartfacility.user.entity;
 
+import de.artur.smartfacility.building.entity.Building;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -22,6 +25,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Building> buildings;
 
     // Methoden
 
@@ -58,5 +64,12 @@ public class User {
     }
     public Role getRole(){
         return this.role;
+    }
+
+    public void setBuildings(List<Building> buildings){
+        this.buildings = buildings;
+    }
+    public List<Building> getBuildings(){
+        return this.buildings;
     }
 }
