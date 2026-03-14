@@ -28,16 +28,14 @@ public class BuildingController {
 
     @PostMapping("/users/{userId}")
     public ResponseEntity<BuildingResponse> createBuilding(@PathVariable Long userId, @RequestBody BuildingCreateRequest dto) {
-        return buildingService.createBuilding(userId, dto)
-                .map(b -> ResponseEntity.status(HttpStatus.CREATED).body(b))
-                .orElse(ResponseEntity.notFound().build());
+        BuildingResponse response = buildingService.createBuilding(userId, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/{buildingId}/rooms")
     public ResponseEntity<RoomResponse> createRoomInBuilding(@PathVariable Long buildingId, @RequestBody RoomCreateRequest dto) {
-        return roomService.createRoomInBuilding(buildingId, dto)
-                .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
-                .orElse(ResponseEntity.notFound().build());
+        RoomResponse response = roomService.createRoomInBuilding(buildingId, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{buildingId}/rooms")
@@ -55,24 +53,19 @@ public class BuildingController {
 
     @GetMapping("/{id}")
     public ResponseEntity<BuildingResponse> getBuildingById(@PathVariable Long id) {
-        return buildingService.getBuildingById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        BuildingResponse response = buildingService.getBuildingById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BuildingResponse> updateBuilding(@PathVariable Long id, @RequestBody BuildingCreateRequest dto) {
-        return buildingService.updateBuilding(id, dto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        BuildingResponse response = buildingService.updateBuilding(id, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBuilding(@PathVariable Long id) {
-        boolean deletedBuilding = buildingService.deleteBuildingById(id);
-        if (!deletedBuilding) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.noContent().build();
+        buildingService.deleteBuildingById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

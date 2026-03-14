@@ -3,6 +3,7 @@ package de.artur.smartfacility.room.api;
 import de.artur.smartfacility.room.dto.RoomCreateRequest;
 import de.artur.smartfacility.room.dto.RoomResponse;
 import de.artur.smartfacility.room.service.RoomService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,24 +28,19 @@ public class RoomController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RoomResponse> GetRoomById(@PathVariable Long id) {
-        return roomService.getRoomById(id)
-                .map(room -> ResponseEntity.ok(room))
-                .orElse(ResponseEntity.notFound().build());
+        RoomResponse response = roomService.getRoomById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long id, @RequestBody RoomCreateRequest dto){
-        return roomService.updateRoom(id, dto)
-                .map(r -> ResponseEntity.ok(r))
-                .orElse(ResponseEntity.notFound().build());
+        RoomResponse response = roomService.updateRoom(id, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long id){
-        boolean deletedRoom = roomService.deleteRoom(id);
-        if(!deletedRoom){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.noContent().build();
+        roomService.deleteRoom(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

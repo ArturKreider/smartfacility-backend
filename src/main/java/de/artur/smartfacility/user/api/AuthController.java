@@ -20,23 +20,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> createUser(@RequestBody RegisterRequest dto){
-        return userService.createUser(dto)
-                .map(user -> ResponseEntity.status(HttpStatus.CREATED).body(user))
-                .orElse(ResponseEntity.badRequest().build());
+       UserResponse response = userService.createUser(dto);
+       return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody LoginRequest dto){
-        return userService.login(dto)
-                .map(user -> ResponseEntity.status(HttpStatus.OK).body(user))
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        UserResponse response = userService.login(dto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser (@PathVariable Long id){
-        if(!userService.deleteUser(id)){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.noContent().build();
+       userService.deleteUser(id);
+       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -1,5 +1,8 @@
 package de.artur.smartfacility.user.service;
 
+import de.artur.smartfacility.exception.EmailAlreadyExistsException;
+import de.artur.smartfacility.exception.InvalidCredentialsException;
+import de.artur.smartfacility.exception.UserNotFoundException;
 import de.artur.smartfacility.user.dto.LoginRequest;
 import de.artur.smartfacility.user.dto.RegisterRequest;
 import de.artur.smartfacility.user.dto.UserResponse;
@@ -9,7 +12,6 @@ import de.artur.smartfacility.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.net.PasswordAuthentication;
 import java.util.Optional;
 
 @Service
@@ -23,40 +25,39 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Optional<UserResponse> createUser (RegisterRequest dto){
+    public UserResponse createUser (RegisterRequest dto){
         boolean existByEmail = userRepository.existsByEmail(dto.getEmail());
         if (existByEmail){
-            return Optional.empty();
+            throw new EmailAlreadyExistsException("Email existiert bereits");
         }
         User newUser = mapToEntity(dto);
         newUser.setRole(Role.USER);
         String hashedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(hashedPassword);
         User registeredUser = userRepository.save(newUser);
-        UserResponse response = mapToResponse(registeredUser);
-        return Optional.of(response);
+        return mapToResponse(registeredUser);
     }
 
-    public Optional<UserResponse> login (LoginRequest login){
+
+    public UserResponse login (LoginRequest login){
         Optional<User> optionalUser = userRepository.findByEmail(login.getEmail());
         if(optionalUser.isEmpty()){
-            return Optional.empty();
+            throw new InvalidCredentialsException("Email oder Passwort falsch");
         }
         User existingUser = optionalUser.get();
         boolean passwordCorrect = passwordEncoder.matches(login.getPassword(), existingUser.getPassword());
         if(!passwordCorrect){
-            return Optional.empty();
+            throw new InvalidCredentialsException("Email oder Passwort falsch");
         }
-        UserResponse response = mapToResponse(existingUser);
-        return Optional.of(response);
+        return mapToResponse(existingUser);
     }
 
-    public boolean deleteUser (Long id){
+
+    public void deleteUser (Long id){
         if(!userRepository.existsById(id)){
-            return false;
+            throw new UserNotFoundException("User existiert nicht");
         }
         userRepository.deleteById(id);
-        return true;
     }
 
     // Mapping

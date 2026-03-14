@@ -4,6 +4,8 @@ import de.artur.smartfacility.building.dto.BuildingCreateRequest;
 import de.artur.smartfacility.building.dto.BuildingResponse;
 import de.artur.smartfacility.building.entity.Building;
 import de.artur.smartfacility.building.repository.BuildingRepository;
+import de.artur.smartfacility.exception.BuildingNotFoundException;
+import de.artur.smartfacility.exception.UserNotFoundException;
 import de.artur.smartfacility.user.entity.User;
 import de.artur.smartfacility.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -26,18 +28,18 @@ public class BuildingService {
 
     // Methoden
 
-    public Optional<BuildingResponse> createBuilding(Long userId, BuildingCreateRequest dto) {
+    public BuildingResponse createBuilding(Long userId, BuildingCreateRequest dto) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()){
-            return Optional.empty();
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("Der User wurde nicht gefunden");
         }
         User existingUser = optionalUser.get();
         Building building = mapToEntity(dto);
         building.setUser(existingUser);
         Building savedBuilding = buildingRepository.save(building);
-        BuildingResponse response = mapToResponse(savedBuilding);
-        return Optional.of(response);
+        return mapToResponse(savedBuilding);
     }
+
 
     public List<BuildingResponse> getAllBuildings() {
         Iterable<Building> buildingList = buildingRepository.findAll();
@@ -48,20 +50,19 @@ public class BuildingService {
         return buildingResponses;
     }
 
-    public Optional<BuildingResponse> getBuildingById(Long id) {
-        Optional<Building> optionalBuilding = buildingRepository.findById(id);
+    public BuildingResponse getBuildingById(Long buildingId) {
+        Optional<Building> optionalBuilding = buildingRepository.findById(buildingId);
         if (optionalBuilding.isEmpty()) {
-            return Optional.empty();
+            throw new BuildingNotFoundException("Gebäude existiert nicht");
         }
         Building building = optionalBuilding.get();
-        BuildingResponse response = mapToResponse(building);
-        return Optional.of(response);
+        return mapToResponse(building);
     }
 
-    public Optional<BuildingResponse> updateBuilding(Long id, BuildingCreateRequest dto) {
-        Optional<Building> optionalBuilding = buildingRepository.findById(id);
+    public BuildingResponse updateBuilding(Long buildingId, BuildingCreateRequest dto) {
+        Optional<Building> optionalBuilding = buildingRepository.findById(buildingId);
         if (optionalBuilding.isEmpty()) {
-            return Optional.empty();
+            throw new BuildingNotFoundException("Gebäude existiert nicht");
         }
         Building existingBuilding = optionalBuilding.get();
 
@@ -69,16 +70,14 @@ public class BuildingService {
         existingBuilding.setAddress(dto.getAddress());
 
         Building updatedBuilding = buildingRepository.save(existingBuilding);
-        BuildingResponse buildingResponse = mapToResponse(updatedBuilding);
-        return Optional.of(buildingResponse);
+        return mapToResponse(updatedBuilding);
     }
 
-    public boolean deleteBuildingById(Long id) {
+    public void deleteBuildingById(Long id) {
         if (!buildingRepository.existsById(id)) {
-            return false;
+            throw new BuildingNotFoundException("Gebäude existiert nicht");
         }
         buildingRepository.deleteById(id);
-        return true;
     }
 
 

@@ -2,6 +2,8 @@ package de.artur.smartfacility.room.service;
 
 import de.artur.smartfacility.building.entity.Building;
 import de.artur.smartfacility.building.repository.BuildingRepository;
+import de.artur.smartfacility.exception.BuildingNotFoundException;
+import de.artur.smartfacility.exception.RoomNotFoundException;
 import de.artur.smartfacility.room.dto.RoomCreateRequest;
 import de.artur.smartfacility.room.dto.RoomResponse;
 import de.artur.smartfacility.room.entity.Room;
@@ -26,16 +28,16 @@ public class RoomService {
 
     //Methoden
 
-    public Optional<RoomResponse> createRoomInBuilding(Long buildingId, RoomCreateRequest dto) {
+    public RoomResponse createRoomInBuilding(Long buildingId, RoomCreateRequest dto) {
         Room createRoom = mapToEntity(dto);
         Optional<Building> optionalBuilding = buildingRepository.findById(buildingId);
         if (optionalBuilding.isEmpty()) {
-            return Optional.empty();
+            throw new BuildingNotFoundException("Gebäude existiert nicht");
         }
         Building building = optionalBuilding.get();
         createRoom.setBuilding(building);
         Room savedRoom = roomRepository.save(createRoom);
-        return Optional.of(mapToResponse(savedRoom));
+        return mapToResponse(savedRoom);
     }
 
     public List<RoomResponse> getAllRooms() {
@@ -47,16 +49,19 @@ public class RoomService {
         return responses;
     }
 
-    public Optional<RoomResponse> getRoomById(Long id) {
+    public RoomResponse getRoomById(Long id) {
         Optional<Room> optionalRoom = roomRepository.findById(id);
         if (optionalRoom.isEmpty()) {
-            return Optional.empty();
+            throw new BuildingNotFoundException("Gebäude existiert nicht");
         }
         Room savedRoom = optionalRoom.get();
-        return Optional.of(mapToResponse(savedRoom));
+        return mapToResponse(savedRoom);
     }
 
     public List<RoomResponse> findRoomsByBuildingId(Long buildingId) {
+        if(!buildingRepository.existsById(buildingId)){
+            throw new BuildingNotFoundException("Gebäude existiert nicht");
+        }
         Iterable<Room> rooms  = roomRepository.findRoomsByBuildingId(buildingId);
         List<RoomResponse> responses = new ArrayList<>();
         for(Room currentRoom : rooms){
@@ -65,10 +70,10 @@ public class RoomService {
         return responses;
     }
 
-    public Optional<RoomResponse> updateRoom(Long id, RoomCreateRequest dto) {
+    public RoomResponse updateRoom(Long id, RoomCreateRequest dto) {
         Optional<Room> optionalRoom = roomRepository.findById(id);
         if (optionalRoom.isEmpty()) {
-            return Optional.empty();
+            throw new RoomNotFoundException("Raum existiert nicht");
         }
         Room savedRoom = optionalRoom.get();
 
@@ -77,16 +82,15 @@ public class RoomService {
         savedRoom.setSize(dto.getSize());
 
         Room updatedRoom = roomRepository.save(savedRoom);
-        return Optional.of(mapToResponse(updatedRoom));
+        return mapToResponse(updatedRoom);
     }
 
 
-    public boolean deleteRoom(Long id) {
+    public void deleteRoom(Long id) {
         if (!roomRepository.existsById(id)) {
-            return false;
+            throw new RoomNotFoundException("Raum existiert nicht");
         }
         roomRepository.deleteById(id);
-        return true;
     }
 
     // Mapping
