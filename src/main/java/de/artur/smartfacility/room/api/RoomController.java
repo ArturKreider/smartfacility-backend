@@ -3,6 +3,7 @@ package de.artur.smartfacility.room.api;
 import de.artur.smartfacility.room.dto.RoomCreateRequest;
 import de.artur.smartfacility.room.dto.RoomResponse;
 import de.artur.smartfacility.room.service.RoomService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long id, @RequestBody RoomCreateRequest dto){
+    public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long id, @Valid @RequestBody RoomCreateRequest dto){
         RoomResponse response = roomService.updateRoom(id, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

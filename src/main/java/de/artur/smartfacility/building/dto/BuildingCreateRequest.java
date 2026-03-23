@@ -1,8 +1,13 @@
 package de.artur.smartfacility.building.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class BuildingCreateRequest {
 
+    @NotBlank(message = "Gebäudename darf nicht leer sein")
     private String name;
+
+    @NotBlank(message = "Adresse darf nicht leer sein")
     private String address;
 
     // Methoden

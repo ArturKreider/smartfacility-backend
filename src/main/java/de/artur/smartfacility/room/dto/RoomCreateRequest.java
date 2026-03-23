@@ -1,9 +1,17 @@
 package de.artur.smartfacility.room.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 public class RoomCreateRequest {
 
+    @NotBlank(message = "Raumname darf nicht leer sein")
     private String name;
+
+    @NotBlank(message = "Etage darf nicht leer sein")
     private String floor;
+
+    @Positive(message = "Größe muss größer 0 sein")
     private Double size;
 
 

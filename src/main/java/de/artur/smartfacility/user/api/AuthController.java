@@ -4,6 +4,7 @@ import de.artur.smartfacility.user.dto.LoginRequest;
 import de.artur.smartfacility.user.dto.RegisterRequest;
 import de.artur.smartfacility.user.dto.UserResponse;
 import de.artur.smartfacility.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +20,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> createUser(@RequestBody RegisterRequest dto){
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody RegisterRequest dto){
        UserResponse response = userService.createUser(dto);
        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest dto){
+    public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest dto){
         UserResponse response = userService.login(dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

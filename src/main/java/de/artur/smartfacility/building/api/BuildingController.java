@@ -7,6 +7,7 @@ import de.artur.smartfacility.building.service.BuildingService;
 import de.artur.smartfacility.room.dto.RoomCreateRequest;
 import de.artur.smartfacility.room.dto.RoomResponse;
 import de.artur.smartfacility.room.service.RoomService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,13 @@ public class BuildingController {
     }
 
     @PostMapping("/users/{userId}")
-    public ResponseEntity<BuildingResponse> createBuilding(@PathVariable Long userId, @RequestBody BuildingCreateRequest dto) {
+    public ResponseEntity<BuildingResponse> createBuilding(@PathVariable Long userId, @Valid @RequestBody BuildingCreateRequest dto) {
         BuildingResponse response = buildingService.createBuilding(userId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/{buildingId}/rooms")
-    public ResponseEntity<RoomResponse> createRoomInBuilding(@PathVariable Long buildingId, @RequestBody RoomCreateRequest dto) {
+    public ResponseEntity<RoomResponse> createRoomInBuilding(@PathVariable Long buildingId, @Valid @RequestBody RoomCreateRequest dto) {
         RoomResponse response = roomService.createRoomInBuilding(buildingId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -58,7 +59,7 @@ public class BuildingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BuildingResponse> updateBuilding(@PathVariable Long id, @RequestBody BuildingCreateRequest dto) {
+    public ResponseEntity<BuildingResponse> updateBuilding(@PathVariable Long id, @Valid @RequestBody BuildingCreateRequest dto) {
         BuildingResponse response = buildingService.updateBuilding(id, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
